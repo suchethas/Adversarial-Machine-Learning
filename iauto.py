@@ -118,6 +118,42 @@ def make_layers_decoder(cfg_decoder, batch_norm=False):
             inn_channels = cfg_decoder[v]
     return nn.Sequential(*layers_decoder)
 
+
+# class Interpolate(nn.Module):
+#     def __init__(self, size, mode):
+#         super(Interpolate, self).__init__()
+#         self.interp = nn.functional.interpolate
+#         self.size = size
+#         self.mode = mode
+
+#     def forward(self, x):
+#         x = self.interp(x, size=self.size, mode=self.mode, align_corners=False)
+#         return x
+
+# def make_layers_decoder(cfg_decoder, batch_norm=False):
+#     layers_decoder = []
+#     s = [14, 28, 56, 112, 224]
+#     si = 0
+#     inn_channels = 512
+#     for v in range(len(cfg_decoder)):
+#         if cfg_decoder[v] == 'M':
+#             #trans_conv2d = nn.UpsamplingBilinear2d(size=(s[si], s[si]))
+#             trans_conv2d = Interpolate(size=(s[si], s[si]), mode='bilinear')
+#             layers_decoder += [trans_conv2d, nn.ReLU(inplace=True)]
+#             si = si+1
+#         else:
+#             trans_conv2d = nn.ConvTranspose2d(inn_channels, cfg_decoder[v], kernel_size=3, padding=1)
+
+#             if v<=len(cfg_decoder)-2:
+#                 if cfg_decoder[v+1]=='M':
+#                     layers_decoder += [trans_conv2d]
+#                 else:
+#                     layers_decoder += [trans_conv2d, nn.ReLU(inplace=True)]
+#             else:
+#                 layers_decoder += [trans_conv2d]
+#             inn_channels = cfg_decoder[v]
+#     return nn.Sequential(*layers_decoder)
+
 cfg_decoder = {
     'D' : ['M', 512, 512, 512, 'M', 512, 512,  256, 'M', 256, 256,  128, 'M', 128,  64, 'M', 64, 1],
 }
