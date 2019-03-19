@@ -80,10 +80,9 @@ for epoch in range(num_epoch):
     correct = 0
     l = []
     for batch_idx, inp_data in enumerate(tqdm(dset_loaders),1):
-        #print(epoch, batch_idx)
+        
         inputs = inp_data[0].cuda()
-        #inpu = inputs.to(device)
-        #print(inputs)
+        
         paths = inp_data[1]
         target = []
         for i in range(len(paths)):
@@ -109,18 +108,17 @@ for epoch in range(num_epoch):
             else:
                 target.append(9)
 
-        #target.to_tensor().cuda()
+       
         t=torch.FloatTensor(target)
         t=t.long().cuda()
-        #print(t)
+        
         outputs = model(inputs)
-        #print(outputs)
+        
         _, preds = torch.max(outputs, 1)
-        #print(preds)
-        #print(preds, t.data)
+      
 
         loss = criterion(outputs, t)
-        #print(loss)
+       
         if batch_idx%100==0 or batch_idx==len(dsets)/20:
             l.append(loss.data)
         with torch.no_grad():
