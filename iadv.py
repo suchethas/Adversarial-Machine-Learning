@@ -95,13 +95,11 @@ def attack(model, optimizer, epsilon, criterion):
     correct_after = 0
 
     for batch_idx, inp_data in enumerate(tqdm(dset_loaders),1):
-        #print(epoch, batch_idx)
+        
         inputs = inp_data[0].cuda()
-        #inputs.cuda()
+        
         inputs.requires_grad=True
-        #inputs.cuda()
-        #inpu = inputs.to(device)
-        #print(inputs)
+        
         paths = inp_data[1]
         target = []
         for i in range(len(paths)):
@@ -127,10 +125,10 @@ def attack(model, optimizer, epsilon, criterion):
             else:
                 target.append(9)
 
-        #target.to_tensor().cuda()
+        
         t=torch.FloatTensor(target)
         t=t.long().cuda()
-        #print(t)
+        
         outputs_before = model(inputs)
         _, preds_before = torch.max(outputs_before, 1)
         correct_before += torch.sum(preds_before == t.data)
