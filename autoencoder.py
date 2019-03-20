@@ -81,7 +81,8 @@ def freeze_layer(layer):
     for param in layer.parameters():
         param.requires_grad = False
 
-# This does not work if batch_norm=False.  Need to replace the code when batch_norm=False.  
+# This does not work if batch_norm=False.  
+# Need to replace the code for make_layers_decoder when batch_norm=False.  
 def make_layers_decoder(cfg_decoder, batch_norm=True):
     layers_decoder = []
     s = [512, 512, 256, 128, 64]
