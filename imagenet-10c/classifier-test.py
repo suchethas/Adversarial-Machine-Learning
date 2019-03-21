@@ -35,7 +35,7 @@ class Data(Dataset):
         self.__ys = []
 
         self.transform = transform
-        with open("da.csv", 'r+') as csvfile:
+        with open("imageval.csv", 'r+') as csvfile:
             read = csv.reader(csvfile, delimiter=',')
             for row in read:
                 self.__xs.append(row[0])
