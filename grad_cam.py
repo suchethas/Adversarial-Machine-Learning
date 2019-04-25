@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-#
-# Author:   Kazuto Nakashima
-# URL:      http://kazuto1011.github.io
-# Created:  2017-05-26
-
 from collections import OrderedDict, Sequence
 
 import numpy as np
@@ -62,55 +55,6 @@ class _BaseWrapper(object):
         """
         for handle in self.handlers:
             handle.remove()
-
-
-# class BackPropagation(_BaseWrapper):
-#     def forward(self, image):
-#         self.image = image.requires_grad_()
-#         return super().forward(self.image)
-
-#     def generate(self):
-#         gradient = self.image.grad.clone()
-#         self.image.grad.zero_()
-#         return gradient
-
-
-# class GuidedBackPropagation(BackPropagation):
-#     """
-#     "Striving for Simplicity: the All Convolutional Net"
-#     https://arxiv.org/pdf/1412.6806.pdf
-#     Look at Figure 1 on page 8.
-#     """
-
-#     def __init__(self, model):
-#         super(GuidedBackPropagation, self).__init__(model)
-
-#         def backward_hook(module, grad_in, grad_out):
-#             # Cut off negative gradients
-#             if isinstance(module, nn.ReLU):
-#                 return (torch.clamp(grad_in[0], min=0.0),)
-
-#         for module in self.model.named_modules():
-#             self.handlers.append(module[1].register_backward_hook(backward_hook))
-
-
-# class Deconvnet(BackPropagation):
-#     """
-#     "Striving for Simplicity: the All Convolutional Net"
-#     https://arxiv.org/pdf/1412.6806.pdf
-#     Look at Figure 1 on page 8.
-#     """
-
-#     def __init__(self, model):
-#         super(Deconvnet, self).__init__(model)
-
-#         def backward_hook(module, grad_in, grad_out):
-#             # Cut off negative gradients and ignore ReLU
-#             if isinstance(module, nn.ReLU):
-#                 return (torch.clamp(grad_out[0], min=0.0),)
-
-#         for module in self.model.named_modules():
-#             self.handlers.append(module[1].register_backward_hook(backward_hook))
 
 
 class GradCAM(_BaseWrapper):
