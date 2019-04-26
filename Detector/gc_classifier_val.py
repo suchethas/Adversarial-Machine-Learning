@@ -42,6 +42,7 @@ class Data(Dataset):
                 self.__xs.append(row[0])
                 self.__ys.append(row[1])
                 if "orig" in row[0]:
+                    print("found orig")
                     self.__zs.append(0)
                 else: #perturb
                     self.__zs.append(1)
@@ -78,15 +79,24 @@ trans = transforms.Compose([transforms.Resize(224),transforms.CenterCrop(224),tr
 dsets = Data(transform=trans)
 dset_loaders = torch.utils.data.DataLoader(dsets, batch_size = 64, shuffle = True, num_workers=4)
 
+#model = models.vgg16_bn(pretrained=True)
+#first_conv_layer = [nn.Conv2d(4, 3, kernel_size=3, stride=1, padding=1)]
+#first_conv_layer.extend(list(model.features))
+#model.features= nn.Sequential(*first_conv_layer )
+#num_ftrs = model.classifier[6].in_features
+#model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=2)
+
 model = models.vgg16_bn(pretrained=True)
+num_ftrs = model.classifier[6].in_features
+model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=10)
+model.load_state_dict(torch.load('model_imageclass10bn.pth'))
 first_conv_layer = [nn.Conv2d(4, 3, kernel_size=3, stride=1, padding=1)]
 first_conv_layer.extend(list(model.features))
 model.features= nn.Sequential(*first_conv_layer )
 num_ftrs = model.classifier[6].in_features
 model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=2)
-
 model.cuda()
-model.load_state_dict(torch.load('model_gc_classifier.pth'))
+model.load_state_dict(torch.load('model_gc_classifier2.pth'))
 
 if torch.cuda.device_count() > 1:
     print("Let's use", torch.cuda.device_count(), "GPUs!")

@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import os
 import csv
 
+
 class Data(Dataset):
     def __init__(self,  transform):
         self.__xs = [] #input
@@ -56,7 +57,7 @@ class Data(Dataset):
         img2 = img2.convert('L')
         if self.transform is not None:
             img2 = self.transform(img2)
-
+        
         a = np.zeros(shape=(4,224,224))
         a[0,:,:]=img1[0,:,:]
         a[1,:,:]=img1[1,:,:]
@@ -72,9 +73,8 @@ class Data(Dataset):
     # Override to give PyTorch size of dataset
     def __len__(self):
         return len(self.__xs)
-        
-        
-        
+
+
 def freeze_layer(layer):
     for param in layer.parameters():
         param.requires_grad = False
@@ -85,9 +85,12 @@ dsets = Data(transform=trans)
 dset_loaders = torch.utils.data.DataLoader(dsets, batch_size = 64, shuffle = True, num_workers=4)
 
 model = models.vgg16_bn(pretrained=True)
+num_ftrs = model.classifier[6].in_features
+model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=10)
+model.load_state_dict(torch.load('model_imageclass10bn.pth'))
 first_conv_layer = [nn.Conv2d(4, 3, kernel_size=3, stride=1, padding=1)]
-first_conv_layer.extend(list(model.features))
-model.features= nn.Sequential(*first_conv_layer )
+first_conv_layer.extend(list(model.features))  
+model.features= nn.Sequential(*first_conv_layer ) 
 num_ftrs = model.classifier[6].in_features
 model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=2)
 
@@ -112,18 +115,17 @@ optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 num_epoch = 35
 best_acc = 0
 train_loss = []
-
 for epoch in range(num_epoch):
     correct = 0
     l = []
-    for batch_idx, inp_data in enumerate(tqdm(dset_loaders),1):
+    for batch_idx, inp_data in enumerate(tqdm(dset_loaders),1):        
         inputs = inp_data[0].cuda()
         inputs = inputs.float()
         target = inp_data[1].cuda()
         outputs = model(inputs)
         _, preds = torch.max(outputs, 1)
         loss = criterion(outputs, target)
-
+       
         if batch_idx%100==0 or batch_idx==len(dsets)/64:
             l.append(loss.data)
 
@@ -134,9 +136,9 @@ for epoch in range(num_epoch):
         train_loss.append(loss.item())
         plt.plot(np.arange(len(train_loss)), train_loss)
         plt.ylim(0, 5)
-        plt.savefig('train_curve_gc_classifier.jpg')
+        plt.savefig('train_curve_gc_classifier2.jpg')
         plt.close()
     acc= (correct.double()/len(dsets))*100
-    torch.save(model.module.state_dict(), 'model_gc_classifier.pth')
-    print('loss=', l)
+    torch.save(model.module.state_dict(), 'model_gc_classifier2.pth')
+    print('loss=', l)	
     print('{} Accuracy: {:.4f}'.format(epoch+1, acc))

@@ -92,13 +92,22 @@ trans = transforms.Compose([transforms.Resize(224),transforms.CenterCrop(224),tr
 dsets = Data(transform=trans)
 dset_loaders = torch.utils.data.DataLoader(dsets, batch_size = 64, shuffle = True, num_workers=4)
 
+#model = models.vgg16_bn(pretrained=True)
+#first_conv_layer = [nn.Conv2d(5, 3, kernel_size=3, stride=1, padding=1)]
+#first_conv_layer.extend(list(model.features))  
+#model.features= nn.Sequential(*first_conv_layer ) 
+#num_ftrs = model.classifier[6].in_features
+#model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=2)
+
 model = models.vgg16_bn(pretrained=True)
+num_ftrs = model.classifier[6].in_features
+model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=10)
+model.load_state_dict(torch.load('model_imageclass10bn.pth'))
 first_conv_layer = [nn.Conv2d(5, 3, kernel_size=3, stride=1, padding=1)]
-first_conv_layer.extend(list(model.features))  
-model.features= nn.Sequential(*first_conv_layer ) 
+first_conv_layer.extend(list(model.features))
+model.features= nn.Sequential(*first_conv_layer )
 num_ftrs = model.classifier[6].in_features
 model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=2)
-
 freeze_layer(model)
 for param in model.features[0].parameters():
     param.requires_grad = True
@@ -141,9 +150,9 @@ for epoch in range(num_epoch):
         train_loss.append(loss.item())
         plt.plot(np.arange(len(train_loss)), train_loss)
         plt.ylim(0, 5)
-        plt.savefig('train_curve_gcae_classifier.jpg')
+        plt.savefig('train_curve_gcae_classifier2.jpg')
         plt.close()
     acc= (correct.double()/len(dsets))*100
-    torch.save(model.module.state_dict(), 'model_gcae_classifier.pth')
+    torch.save(model.module.state_dict(), 'model_gcae_classifier2.pth')
     print('loss=', l)	
     print('{} Accuracy: {:.4f}'.format(epoch+1, acc))

@@ -69,7 +69,7 @@ model = models.vgg16_bn(pretrained=True)
 num_ftrs = model.classifier[6].in_features
 model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=2)
 model.cuda()
-model.load_state_dict(torch.load('model_naive.pth'))
+model.load_state_dict(torch.load('model_naive2.pth'))
 if torch.cuda.device_count() > 1:
     print("Let's use", torch.cuda.device_count(), "GPUs!")
     model = nn.DataParallel(model)
@@ -78,7 +78,7 @@ criterion = nn.CrossEntropyLoss()
 model.eval()
 correct = 0
 l = []
-
+acc = 0
 with torch.no_grad():
     for batch_idx, inp_data in enumerate(tqdm(dset_loaders),1):        
         inputs = inp_data[0].cuda()
@@ -87,6 +87,6 @@ with torch.no_grad():
         _, preds = torch.max(outputs, 1)
         loss = criterion(outputs, target)
         correct += torch.sum(preds == target.data)
-    acc = (correct.double()/len(dsets))*100
-	
-print('Accuracy: {:.4f}'.format(acc))
+    acc += correct.double()
+
+print('Accuracy: {:.4f}'.format((acc/len(dsets))*100))
