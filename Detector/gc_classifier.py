@@ -92,6 +92,8 @@ num_ftrs = model.classifier[6].in_features
 model.classifier[6] = nn.Linear(in_features=num_ftrs,out_features=2)
 
 freeze_layer(model)
+for param in model.features[0].parameters():
+    param.requires_grad = True
 for param in model.classifier[6].parameters():
     param.requires_grad = True
 for param in model.classifier[3].parameters():
