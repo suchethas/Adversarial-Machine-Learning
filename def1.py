@@ -191,7 +191,7 @@ for i in range(num_epoch):
             class_outputs = classif(inputs)
             _, class_preds = torch.max(class_outputs, 1)
             correct += torch.sum(class_preds == classifier_label.data)
-            acc = (correct.double()/((batch_idx+1)*len(inputs)))*100
+            acc = (correct.double()/((batch_idx)*len(inputs)))*100
             print('Accuracy before: {:.4f}'.format(acc))
         idx = (preds == 1).nonzero()#.type(torch.LongTensor)
         idx = idx.view(-1)
@@ -215,7 +215,7 @@ for i in range(num_epoch):
             class_outputs_after = classif(inputs2)
             _, class_preds_after = torch.max(class_outputs_after, 1)
             correct_after += torch.sum(class_preds_after == classifier_label.data)
-            acc_after = (correct_after.double()/((batch_idx+1)*len(inputs)))*100
+            acc_after = (correct_after.double()/((batch_idx)*len(inputs)))*100
             print('Accuracy after: {:.4f}'.format(acc_after))
     #correct += torch.sum(preds == target.data)
     #acc = (correct.double()/len(dsets))*100
