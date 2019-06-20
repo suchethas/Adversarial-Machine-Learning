@@ -22,7 +22,7 @@ import pdb
 import csv
 
 plt.ion()
-PATH = '/home/shihong/imagenet-10/'
+PATH = '/home/shihong/imagenet-10/val_s'
 res_dir = 'imagenet_adv' 
 def create_path(path):
     if os.path.isdir(path) is False:
@@ -34,7 +34,7 @@ class Data(Dataset):
         self.__ys = []
 
         self.transform = transform
-        with open("da.csv", 'r+') as csvfile:
+        with open("input_val_gcae3.csv", 'r+') as csvfile:
             read = csv.reader(csvfile, delimiter=',')
             for row in read:
                 self.__xs.append(row[0])
@@ -106,13 +106,16 @@ def fgsm_attack(image, epsilon, data_grad, paths):
     perturbed_image = image + epsilon*sign_data_grad
     image0 = image.cpu().data
     perturbed_image0 = perturbed_image.cpu().data
-
-
     for xi in range(25):
         save_path = os.path.join(res_dir, paths[xi].split('/')[5],paths[xi].split('/')[6].split(".")[0])
         create_path(os.path.join(save_path.split('/')[0], save_path.split('/')[1]))
         utils.save_image(inv_normalize(image0[xi,:,:,:]), save_path + '_orig.png', padding=0)
         utils.save_image(inv_normalize(perturbed_image0[xi,:,:,:]), save_path + '_perturb.png', padding=0)
+
+    for i in range(len(perturbed_image)):
+        perturbed_image[i] = inv_normalize(perturbed_image[i])
+        perturbed_image[i] = perturbed_image[i].mul_(255).round_().clamp_(0, 255).div_(255)
+        perturbed_image[i] = normalize(perturbed_image[i])
     return perturbed_image
 
 def attack(model, optimizer, epsilon, criterion):
